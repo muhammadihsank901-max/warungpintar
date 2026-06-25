@@ -1,0 +1,1225 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WarungPintar Enterprise Hub v35.0 - Super Ultimate Edition</title>
+    <style>
+        :root {
+            --primary: #1e3a8a;
+            --primary-dark: #0f172a;
+            --secondary: #3b82f6;
+            --accent: #06b6d4;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --border: #cbd5e0;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --success: #10b981;
+            --card-bg: #ffffff;
+            --text-muted: #64748b;
+        }
+        
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+        body { background-color: #f1f5f9; color: var(--dark); display: flex; flex-direction: column; min-height: 100vh; padding: 15px; }
+        
+        .container { max-width: 1500px; margin: 0 auto; width: 100%; }
+
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white; padding: 20px 25px; display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1); border-radius: 12px; margin-bottom: 20px;
+        }
+        
+        .nav-tabs { display: flex; background: #fff; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 20px; overflow-x: auto; }
+        .tab-btn {
+            padding: 15px 25px; border: none; background: none; font-size: 15px; font-weight: 600; 
+            color: #718096; cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.2s;
+            white-space: nowrap; display: flex; align-items: center; gap: 8px; flex: 1; text-align: center; justify-content: center;
+        }
+        .tab-btn:hover { color: var(--secondary); background: #f8fafc; }
+        .tab-btn.active { color: var(--secondary); border-bottom-color: var(--secondary); background: #eff6ff; }
+        
+        .main-content { display: none; }
+        .main-content.active { display: block; }
+        
+        .pos-grid, .gudang-grid, .two-col-grid { display: grid; grid-template-columns: 1.6fr 1.4fr; gap: 20px; }
+        @media(max-width: 1024px) { .pos-grid, .gudang-grid, .two-col-grid { grid-template-columns: 1fr; } }
+        
+        .card { background: var(--card-bg); border-radius: 12px; padding: 20px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        .title-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; }
+        
+        .btn { padding: 10px 18px; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px; font-size: 14px; }
+        .btn-p { background-color: var(--secondary); color: white; }
+        .btn-p:hover { background-color: #2563eb; }
+        .btn-d { background-color: var(--danger); color: white; }
+        .btn-w { background-color: var(--warning); color: white; }
+        .btn-g { background-color: var(--success); color: white; }
+        .btn-ai { background-color: var(--accent); color: white; }
+        .btn-ai:hover { background-color: #0891b2; }
+        .btn-mic-active { background-color: var(--danger) !important; animation: pulse 1.2s infinite; }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .filter-bar { display: flex; gap: 6px; margin-bottom: 15px; flex-wrap: wrap; }
+        .p-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; max-height: 500px; overflow-y: auto; padding: 5px; border: 1px solid #e2e8f0; border-radius: 8px; background: #f8fafc; }
+        .p-card { border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between; min-height: 140px; background: #fff; cursor: pointer; transition: all 0.2s; }
+        .p-card:hover { transform: translateY(-2px); box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-color: var(--secondary); }
+        .p-card.low-stock { border-color: var(--danger); background: #fef2f2; }
+        .p-title { font-size: 13px; font-weight: 600; text-align: center; color: var(--dark); }
+        
+        .cart-list { list-style: none; max-height: 250px; overflow-y: auto; margin-bottom: 15px; border: 1px solid #e2e8f0; border-radius: 6px; padding: 5px; }
+        .cart-item { display: flex; justify-content: space-between; align-items: center; padding: 8px; border-bottom: 1px solid #f1f5f9; font-size: 14px; }
+        .qty-controls { display: flex; align-items: center; gap: 5px; }
+        .qty-btn { width: 26px; height: 26px; border: none; background: #e2e8f0; border-radius: 4px; font-weight: bold; cursor: pointer; }
+        
+        .form-group { margin-bottom: 12px; display: flex; flex-direction: column; gap: 5px; }
+        .form-control { padding: 10px; border: 1px solid #cbd5e0; border-radius: 6px; font-size: 14px; width: 100%; color: var(--dark); }
+        .input-with-mic { display: flex; gap: 5px; }
+
+        .table-responsive { overflow-x: auto; border: 1px solid #e2e8f0; border-radius: 8px; max-height: 500px; overflow-y: auto; }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th, td { padding: 12px; border-bottom: 1px solid #e2e8f0; font-size: 14px; }
+        th { background-color: #f8fafc; color: var(--primary); font-weight: 600; position: sticky; top: 0; z-index: 10; }
+        
+        .finance-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px; }
+        .finance-box { padding: 12px; border-radius: 8px; text-align: center; color: white; }
+        .box-out { background-color: #ef4444; }
+        .box-in { background-color: #3b82f6; }
+        .box-gain { background-color: #10b981; }
+        .finance-box h4 { font-size: 11px; text-transform: uppercase; margin-bottom: 3px; opacity: 0.9; }
+        .finance-box p { font-size: 16px; font-weight: 700; }
+
+        .modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); backdrop-filter: blur(4px); justify-content: center; align-items: center; z-index: 2000; }
+        .modal-content { background: white; padding: 25px; border-radius: 12px; width: 450px; max-width: 90%; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
+        .secure-lock { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 40px 20px; border: 2px dashed var(--danger); background: #fff5f5; border-radius: 12px; }
+        
+        .badge { padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; color: white; }
+        .badge-locked { background-color: var(--danger); }
+        .badge-unlocked { background-color: var(--success); }
+        
+        .log-box { background: #0f172a; color: #38bdf8; font-family: 'Courier New', monospace; padding: 15px; border-radius: 8px; max-height: 200px; overflow-y: auto; font-size: 12px; }
+        .ai-status-bar { background: #eff6ff; border: 1px solid #bfdbfe; padding: 12px; border-radius: 8px; font-size: 13px; color: var(--primary); font-weight: 600; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div>
+            <h1 id="headerWarungName">WARUNG PINTAR ENTERPRISE HUB</h1>
+            <p style="font-size: 12px; opacity: 0.85;">Sistem ERP Komplit, Analisis Keuangan Dinamis & Voice Multi-Module Engine V35.0</p>
+        </div>
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <span id="securityBadge" class="badge badge-locked">🔒 Mode Kasir Terkunci</span>
+            <button id="lockBtn" class="btn btn-d" style="padding: 5px 10px; font-size: 12px; display: none;" onclick="lockSystemManual()">Lock System</button>
+        </div>
+    </header>
+
+    <nav class="nav-tabs">
+        <button class="tab-btn active" onclick="switchTab('pos')">🛒 POS Kasir + AI</button>
+        <button class="tab-btn" onclick="switchTab('gudang')">📦 Gudang & AI Stok</button>
+        <button class="tab-btn" onclick="switchTab('bon')">📒 Buku Bon</button>
+        <button class="tab-btn" onclick="switchTab('akuntansi')">📊 Analisis Finansial & Laba</button>
+        <button class="tab-btn" onclick="switchTab('pengaturan')">⚙️ Pengaturan & Log</button>
+    </nav>
+
+    <div id="pos" class="main-content active">
+        <div class="ai-status-bar">
+            <span>🤖 <strong>Asisten Kasir Voice-Engine:</strong> Klik 🎤 AI Kasir, lalu ucapkan transaksi. (Contoh: <em>"Beli Indomie Goreng tiga"</em> atau <em>"Jual Surya dua belas dua"</em>).</span>
+        </div>
+        <div class="pos-grid">
+            <div class="card">
+                <div class="filter-bar" id="categoryBar">
+                    <button class="btn btn-p" onclick="filterPOS('Semua')">Semua</button>
+                    <button class="btn btn-p" onclick="filterPOS('Sembako')">Sembako</button>
+                    <button class="btn btn-p" onclick="filterPOS('Makanan Instan')">Makanan Instan</button>
+                    <button class="btn btn-p" onclick="filterPOS('Makanan Ringan')">Makanan Ringan</button>
+                    <button class="btn btn-p" onclick="filterPOS('Minuman')">Minuman</button>
+                    <button class="btn btn-p" onclick="filterPOS('Kebersihan')">Kebersihan</button>
+                    <button class="btn btn-p" onclick="filterPOS('Rokok')">Rokok</button>
+                    <button class="btn btn-p" onclick="filterPOS('Produk Titipan')">Produk Titipan</button>
+                </div>
+                <div class="p-grid" id="posProductGrid"></div>
+            </div>
+            
+            <div class="card">
+                <div class="title-row">
+                    <h3>Keranjang Transaksi</h3>
+                    <button class="btn btn-d" style="padding:4px 10px; font-size:12px;" onclick="clearCart()">Reset</button>
+                </div>
+                <ul class="cart-list" id="cartItemsList"></ul>
+                
+                <div style="border-top:2px solid #e2e8f0; padding-top:12px;">
+                    <div class="form-group">
+                        <span style="font-size:20px; font-weight:700; color:var(--primary);">Total: <span id="cartTotal">Rp 0</span></span>
+                    </div>
+                    <div class="form-group">
+                        <label style="font-size:13px; font-weight:600;">Bayar Tunai (Rp):</label>
+                        <input type="number" id="cashPay" class="form-control" oninput="calculatePOSChange()" style="font-size:18px; font-weight:bold; text-align:right;">
+                    </div>
+                    <div class="form-group">
+                        <span id="posChangeLabel" style="font-weight:700;">Kembalian: <span id="posChangeAmount">Rp 0</span></span>
+                    </div>
+                    
+                    <div style="display:flex; gap:10px; margin-top:15px;">
+                        <button class="btn btn-g" style="flex:1; padding:12px;" onclick="checkoutPOS()">PROSES & CETAK STRUK</button>
+                        <button id="posMicBtn" class="btn btn-ai" onclick="startVoiceAIInterpreter('pos')">🎤 AI Kasir</button>
+                    </div>
+                    <div id="aiVoiceOutput" style="font-size:12px; color:var(--secondary); font-style:italic; text-align:center; margin-top:8px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="ownerAuthGateway" class="main-content">
+        <div class="card secure-lock" style="max-width: 480px; margin: 40px auto;">
+            <h3>🔒 Otorisasi Akses Pemilik (Owner Mode)</h3>
+            <p style="color:var(--text-muted); margin: 10px 0 20px 0; font-size: 14px;">Halaman ini memuat kontrol internal strategis. Silakan verifikasi PIN Anda.</p>
+            <div style="display:flex; gap:10px; width:100%; max-width:320px;">
+                <input type="password" id="gatewayPinInput" class="form-control" placeholder="Masukkan PIN" style="text-align:center; font-size:16px;">
+                <button class="btn btn-p" onclick="unlockGatewayEngine()">Buka Akses</button>
+            </div>
+            <p style="font-size: 11px; color: var(--danger); margin-top: 15px;">*Default PIN awal pabrik: 1234</p>
+        </div>
+    </div>
+
+    <div id="gudang" class="main-content">
+        <div class="ai-status-bar">
+            <span>🤖 <strong>AI Gudang Multi-Fungsi:</strong> Isi form manual untuk memperbaiki item, atau gunakan 🎤 AI Gudang. (Contoh: <em>"Tambah produk baru Kopi Susu harga modal dua ribu harga jual tiga ribu stok seratus"</em>).</span>
+        </div>
+        
+        <div class="gudang-grid">
+            <div class="card">
+                <div class="title-row">
+                    <h3 id="gudangFormTitle">Catatan & Koreksi Item Manual</h3>
+                    <button class="btn btn-d" style="padding: 2px 8px; font-size: 11px;" onclick="resetGudangForm()">Reset</button>
+                </div>
+                <input type="hidden" id="prodIdHidden">
+                <div class="form-group">
+                    <label>Nama Produk:</label>
+                    <div class="input-with-mic">
+                        <input type="text" id="gudangProdName" class="form-control" placeholder="Nama barang">
+                        <button class="btn btn-ai" onclick="startBasicSpeechRoute('gudangProdName')">🎤</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Kategori:</label>
+                    <select id="gudangProdCategory" class="form-control">
+                        <option value="Sembako">Sembako</option>
+                        <option value="Makanan Instan">Makanan Instan</option>
+                        <option value="Makanan Ringan">Makanan Ringan</option>
+                        <option value="Minuman">Minuman</option>
+                        <option value="Kebersihan">Kebersihan</option>
+                        <option value="Rokok">Rokok</option>
+                        <option value="Produk Titipan">Produk Titipan</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Harga Modal (Rp):</label>
+                    <input type="number" id="gudangProdCost" class="form-control" placeholder="0">
+                </div>
+                <div class="form-group">
+                    <label>Harga Jual (Rp):</label>
+                    <input type="number" id="gudangProdPrice" class="form-control" placeholder="0">
+                </div>
+                <div class="form-group">
+                    <label>Stok Sisa:</label>
+                    <input type="number" id="gudangProdStock" class="form-control" placeholder="0">
+                </div>
+                
+                <div style="display: flex; gap: 8px; margin-top: 15px;">
+                    <button class="btn btn-g" style="flex: 1;" onclick="saveProductManual()">💾 Simpan Ke Gudang</button>
+                    <button id="gudangMicBtn" class="btn btn-ai" onclick="startVoiceAIInterpreter('gudang')">🎤 AI Gudang</button>
+                </div>
+                <div id="aiGudangVoiceOutput" style="font-size:11px; color:var(--accent); font-style:italic; text-align:center; margin-top:10px;"></div>
+            </div>
+
+            <div class="card">
+                <div class="title-row">
+                    <h2>Inventaris Gudang</h2>
+                    <span style="font-size:12px; color:var(--danger); font-weight:bold;">⚠️ Merah = Stok Kritis (&le; 15)</span>
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nama Barang</th>
+                                <th>Kategori</th>
+                                <th>Modal</th>
+                                <th>Jual</th>
+                                <th>Stok</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="gudangTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="bon" class="main-content">
+        <div class="two-col-grid">
+            <div class="card">
+                <div class="title-row"><h2>Pencatatan Bon / Piutang</h2></div>
+                <div class="form-group">
+                    <label>Nama Pelanggan:</label>
+                    <div class="input-with-mic">
+                        <input type="text" id="bonName" class="form-control" placeholder="Nama Anggota">
+                        <button class="btn btn-ai" onclick="startBasicSpeechRoute('bonName')">🎤</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Jumlah Hutang (Rp):</label>
+                    <input type="number" id="bonAmount" class="form-control" placeholder="0">
+                </div>
+                <div class="form-group">
+                    <label>Catatan Detail:</label>
+                    <div class="input-with-mic">
+                        <input type="text" id="bonNote" class="form-control" placeholder="Contoh: Rokok Surya 1 pack">
+                        <button class="btn btn-ai" onclick="startBasicSpeechRoute('bonNote')">🎤</button>
+                    </div>
+                </div>
+                <button class="btn btn-g" style="width:100%; justify-content:center;" onclick="addBonRecord()">Simpan ke Buku Buku Bon</button>
+            </div>
+            <div class="card">
+                <div class="title-row"><h2>Daftar Hutang Aktif</h2></div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Pelanggan</th>
+                                <th>Total Bon</th>
+                                <th>Catatan</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bonTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="akuntansi" class="main-content">
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap:15px; margin-bottom:20px;">
+            <div class="card" style="border-left:5px solid var(--secondary); margin-bottom:0;">
+                <p style="font-size:11px; font-weight:700; color:var(--text-muted);">TOTAL OMZET BERJALAN</p>
+                <h2 id="summaryRevenue" style="color:var(--secondary); margin-top:5px;">Rp 0</h2>
+            </div>
+            <div class="card" style="border-left:5px solid var(--success); margin-bottom:0;">
+                <p style="font-size:11px; font-weight:700; color:var(--text-muted);">LABA BERSIH REAL-TIME</p>
+                <h2 id="summaryProfit" style="color:var(--success); margin-top:5px;">Rp 0</h2>
+            </div>
+            <div class="card" style="border-left:5px solid var(--warning); margin-bottom:0;">
+                <p style="font-size:11px; font-weight:700; color:var(--text-muted);">PIUTANG BON BELUM LUNAS</p>
+                <h2 id="summaryBon" style="color:var(--warning); margin-top:5px;">Rp 0</h2>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="title-row">
+                <h2>Analisis Finansial Persentase & Margin</h2>
+                <span style="font-size:12px; color:var(--text-muted);">Simulasi Suara: <em>"Set keuntungan harian empat puluh persen"</em></span>
+            </div>
+            
+            <h4 style="color:var(--text-muted); font-size:13px; margin-bottom:5px;">Analisis Rasio Harian</h4>
+            <div class="finance-grid">
+                <div class="finance-box box-out"><h4>Pengeluaran (HPP)</h4><p id="harianHpp">65.00%</p></div>
+                <div class="finance-box box-in"><h4>Penghasilan</h4><p>100%</p></div>
+                <div class="finance-box box-gain"><h4>Keuntungan</h4><p id="harianProfit">35.00%</p></div>
+            </div>
+
+            <h4 style="color:var(--text-muted); font-size:13px; margin-bottom:5px;">Analisis Rasio Mingguan (Komparatif)</h4>
+            <div class="finance-grid">
+                <div class="finance-box box-out"><h4>Pengeluaran (HPP)</h4><p id="mingguanHpp">62.50%</p></div>
+                <div class="finance-box box-in"><h4>Penghasilan</h4><p>100%</p></div>
+                <div class="finance-box box-gain"><h4>Keuntungan</h4><p id="mingguanProfit">37.50%</p></div>
+            </div>
+
+            <h4 style="color:var(--text-muted); font-size:13px; margin-bottom:5px;">Analisis Rasio Bulanan (Komparatif)</h4>
+            <div class="finance-grid">
+                <div class="finance-box box-out"><h4>Pengeluaran (HPP)</h4><p id="bulananHpp">60.00%</p></div>
+                <div class="finance-box box-in"><h4>Penghasilan</h4><p>100%</p></div>
+                <div class="finance-box box-gain"><h4>Keuntungan</h4><p id="bulananProfit">40.00%</p></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="title-row"><h2>Histori Jurnal Buku Besar Masuk</h2></div>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Waktu Jurnal</th>
+                            <th>Tipe Aliran</th>
+                            <th>Nilai Transaksi</th>
+                            <th>Margin Bersih</th>
+                        </tr>
+                    </thead>
+                    <tbody id="accountingTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="pengaturan" class="main-content">
+        <div class="two-col-grid">
+            <div class="card">
+                <div class="title-row"><h2>Konfigurasi Toko</h2></div>
+                <div class="form-group">
+                    <label>Nama Warung Pintar:</label>
+                    <input type="text" id="cfgName" class="form-control">
+                </div>
+                <button class="btn btn-p" onclick="saveSystemSettings()">Simpan Perubahan</button>
+                
+                <div class="title-row" style="margin-top: 25px;"><h2>Penyimpanan Eksternal</h2></div>
+                <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                    <button class="btn btn-p" onclick="exportSystemDatabase()">📥 Ekspor Backup (.json)</button>
+                    <button class="btn btn-w" onclick="document.getElementById('importFile').click()">📤 Impor Backup</button>
+                    <input type="file" id="importFile" style="display:none;" accept=".json" onchange="importSystemDatabase(event)">
+                </div>
+                
+                <button class="btn btn-d" style="width:100%; margin-top: 30px; justify-content:center;" onclick="secureFactoryReset()">🚨 RESET TOTAL DATA SISTEM</button>
+            </div>
+
+            <div class="card">
+                <div class="title-row"><h2>Ganti Kunci Proteksi Keamanan</h2></div>
+                <div class="form-group">
+                    <label>PIN Lama Toko:</label>
+                    <input type="password" id="pinOld" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>PIN Baru Toko:</label>
+                    <input type="password" id="pinNew" class="form-control">
+                </div>
+                <button class="btn btn-w" style="width:100%; justify-content:center;" onclick="updateSecurityPin()">Ubah PIN Proteksi</button>
+                
+                <div class="title-row" style="margin-top: 20px;"><h2>Live Engine Log & Audit Security</h2></div>
+                <div class="log-box" id="securityLogBox"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="receiptModal">
+    <div class="modal-content" style="font-family:'Courier New', monospace;">
+        <h3 style="text-align:center;" id="stName">WARUNG PINTAR</h3>
+        <p style="text-align:center; font-size:12px;">Struk Transaksi Penjualan</p>
+        <div style="border-top:1px dashed #000; margin:10px 0;"></div>
+        <div id="stItems"></div>
+        <div style="border-top:1px dashed #000; margin:10px 0;"></div>
+        <div style="display:flex; justify-content:space-between;"><span>TOTAL:</span><span id="stTotal"></span></div>
+        <div style="display:flex; justify-content:space-between;"><span>TUNAI:</span><span id="stCash"></span></div>
+        <div style="display:flex; justify-content:space-between;"><span>KEMBALI:</span><span id="stChange"></span></div>
+        <div style="border-top:1px dashed #000; margin:10px 0;"></div>
+        <p style="text-align:center; font-size:11px; font-style:italic;">Terima kasih atas kunjungan Anda.</p>
+        <button class="btn btn-p" style="width:100%; margin-top:15px; font-family:sans-serif;" onclick="closePOSReceipt()">Tutup Nota</button>
+    </div>
+</div>
+
+<script>
+    // DATA GENERATOR INTEGRATED DARI VERSI 30.0 (50+ MASTER BARANG)
+    const rawMasterSetup = [
+        // === SEMBAKO ===
+        { name: "Beras Medium (per kg)", price: 13500, category: "Sembako", stock: 50, info: "-" },
+        { name: "Beras Premium Cianjur (per kg)", price: 16000, category: "Sembako", stock: 40, info: "-" },
+        { name: "Minyak Goreng Bimoli 1L", price: 20000, category: "Sembako", stock: 30, info: "-" },
+        { name: "Minyak Goreng Sania 2L", price: 38500, category: "Sembako", stock: 25, info: "-" },
+        { name: "Minyak Goreng Kita 1L", price: 16000, category: "Sembako", stock: 45, info: "-" },
+        { name: "Gula Pasir Gulaku 1kg", price: 18000, category: "Sembako", stock: 35, info: "-" },
+        { name: "Telur Ayam Negeri (per kg)", price: 28000, category: "Sembako", stock: 30, info: "-" },
+        { name: "Gas LPG 3 kg Melon", price: 22000, category: "Sembako", stock: 20, info: "-" },
+        { name: "Gas LPG 12 kg Bright Gas", price: 210000, category: "Sembako", stock: 10, info: "-" },
+        { name: "Terigu Segitiga Biru 1kg", price: 13000, category: "Sembako", stock: 40, info: "-" },
+        { name: "Garam Kapal 1 Papan", price: 7000, category: "Sembako", stock: 15, info: "-" },
+        { name: "Mentega Blue Band Saset", price: 3500, category: "Sembako", stock: 60, info: "-" },
+        // === MAKANAN INSTAN ===
+        { name: "Indomie Goreng Original", price: 3500, category: "Makanan Instan", stock: 120, info: "-" },
+        { name: "Indomie Kuah Ayam Bawang", price: 3300, category: "Makanan Instan", stock: 100, info: "-" },
+        { name: "Indomie Kuah Soto Mie", price: 3300, category: "Makanan Instan", stock: 100, info: "-" },
+        { name: "Indomie Kari Ayam", price: 3600, category: "Makanan Instan", stock: 80, info: "-" },
+        { name: "Mie Sedaap Goreng Original", price: 3400, category: "Makanan Instan", stock: 120, info: "-" },
+        { name: "Mie Sedaap Soto Singapore", price: 3400, category: "Makanan Instan", stock: 90, info: "-" },
+        { name: "Pop Mie Rasa Ayam Bawang", price: 5500, category: "Makanan Instan", stock: 40, info: "-" },
+        { name: "Sari Roti Tawar Klasik", price: 16000, category: "Makanan Instan", stock: 15, info: "-" },
+        // === MAKANAN RINGAN ===
+        { name: "Chiki Balls Keju Rasa", price: 2500, category: "Makanan Ringan", stock: 50, info: "Snack Saset" },
+        { name: "Roma Kelapa Biskuit", price: 11000, category: "Makanan Ringan", stock: 30, info: "Biskuit Kemasan" },
+        { name: "Keripik Singkong Kusuka 60g", price: 6500, category: "Makanan Ringan", stock: 35, info: "Premium Snack" },
+        { name: "Biskuit Khong Guan Mini", price: 15000, category: "Makanan Ringan", stock: 20, info: "Biskuit Kaleng/Box" },
+        { name: "Malkist Crackers Rasa", price: 7500, category: "Makanan Ringan", stock: 45, info: "Snack Crispy" },
+        { name: "Chitato Keripik Kentang", price: 10500, category: "Makanan Ringan", stock: 30, info: "Premium Snack" },
+        { name: "JetZ Chocolate Fiesta", price: 3000, category: "Makanan Ringan", stock: 50, info: "Snack Saset" },
+        { name: "Pringles Original Small", price: 11500, category: "Makanan Ringan", stock: 25, info: "Snack Tabung" },
+        // === MINUMAN ===
+        { name: "Kopi Kapal Api Mix Saset", price: 2000, category: "Minuman", stock: 200, info: "Kopi Saset" },
+        { name: "Kopi Kapal Api Special Mix", price: 2000, category: "Minuman", stock: 200, info: "Kopi Saset" },
+        { name: "Good Day Mocacinno Saset", price: 2500, category: "Minuman", stock: 150, info: "Kopi Saset" },
+        { name: "Good Day Carrebian Nut", price: 2500, category: "Minuman", stock: 100, info: "Kopi Saset" },
+        { name: "Good Day Coolin", price: 2500, category: "Minuman", stock: 100, info: "Kopi Saset" },
+        { name: "Kopi Luwak White Koffie", price: 2500, category: "Minuman", stock: 120, info: "Kopi Saset" },
+        { name: "Kopi Torabika Gilus Mix", price: 2000, category: "Minuman", stock: 150, info: "Kopi Saset" },
+        { name: "Kopi Torabika Creamy Latte", price: 3000, category: "Minuman", stock: 100, info: "Kopi Saset" },
+        { name: "Kopi Tora Bika Susu", price: 2500, category: "Minuman", stock: 120, info: "Kopi Saset" },
+        { name: "Kopi Indocafe Coffeemix", price: 2500, category: "Minuman", stock: 150, info: "Kopi Saset" },
+        { name: "Kopi Neo Coffee Tiramisu", price: 2000, category: "Minuman", stock: 100, info: "Kopi Saset" },
+        { name: "Kopi ABC Susu Saset", price: 2000, category: "Minuman", stock: 120, info: "Kopi Saset" },
+        { name: "Teh Celup Sariwangi Kotak", price: 7500, category: "Minuman", stock: 40, info: "Teh Kotak Isi" },
+        { name: "Teh Kotak Sosro 300ml", price: 4000, category: "Minuman", stock: 50, info: "RTD Minuman" },
+        { name: "Teh Botol Sosro Kotak 250ml", price: 3500, category: "Minuman", stock: 50, info: "RTD Minuman" },
+        { name: "Teh Pucuk Harum Botol 350ml", price: 4000, category: "Minuman", stock: 80, info: "RTD Minuman" },
+        { name: "Teh Gelas Cup", price: 1500, category: "Minuman", stock: 120, info: "RTD Cup" },
+        { name: "Aqua Air Mineral Botol 600ml", price: 3500, category: "Minuman", stock: 100, info: "Air Mineral" },
+        { name: "Aqua Air Mineral Botol 1500ml", price: 6500, category: "Minuman", stock: 60, info: "Air Mineral" },
+        { name: "Aqua Gelas (per dus)", price: 34000, category: "Minuman", stock: 15, info: "Kartonan" },
+        { name: "Le Minerale Botol 600ml", price: 3500, category: "Minuman", stock: 100, info: "Air Mineral" },
+        { name: "Le Minerale Botol 1500ml", price: 6500, category: "Minuman", stock: 60, info: "Air Mineral" },
+        { name: "Air Mineral Vit Gelas", price: 1000, category: "Minuman", stock: 120, info: "RTD Cup" },
+        { name: "Suku Frisian Flag Saset Cokelat", price: 2000, category: "Minuman", stock: 100, info: "Susu Saset" },
+        { name: "Susu Frisian Flag Saset Putih", price: 2000, category: "Minuman", stock: 100, info: "Susu Saset" },
+        { name: "Susu Indomilk Saset Putih", price: 2000, category: "Minuman", stock: 100, info: "Susu Saset" },
+        { name: "Susu Beruang Bear Brand Can", price: 10500, category: "Minuman", stock: 48, info: "Susu Kaleng" },
+        { name: "Susu Milku Cokelat Botol", price: 3500, category: "Minuman", stock: 60, info: "Susu Botol RTD" },
+        { name: "Susu Ultra Milk Cokelat 250ml", price: 7500, category: "Minuman", stock: 40, info: "Susu Kotak UHT" },
+        { name: "Susu Ultra Milk Full Cream 250ml", price: 7500, category: "Minuman", stock: 40, info: "Susu Kotak UHT" },
+        { name: "Coca Cola Botol 390ml", price: 6500, category: "Minuman", stock: 36, info: "Soda" },
+        { name: "Fanta Strawberry Botol 390ml", price: 6500, category: "Minuman", stock: 36, info: "Soda" },
+        { name: "Sprite Botol 390ml", price: 6500, category: "Minuman", stock: 36, info: "Soda" },
+        { name: "Pulpy Orange Botol", price: 7500, category: "Minuman", stock: 30, info: "RTD Minuman" },
+        { name: "Minute Maid Pulpy", price: 7500, category: "Minuman", stock: 30, info: "RTD Minuman" },
+        { name: "Pocari Sweat Botol 350ml", price: 7000, category: "Minuman", stock: 40, info: "Isotonik" },
+        { name: "Pocari Sweat Kaleng", price: 7500, category: "Minuman", stock: 30, info: "Isotonik" },
+        { name: "Hydro Coco 250ml", price: 7000, category: "Minuman", stock: 30, info: "Air Kelapa Kemasan" },
+        { name: "Nutrisari Jeruk Peras Saset", price: 2500, category: "Minuman", stock: 100, info: "Minuman Serbuk" },
+        { name: "Nutrisari Sweet Mango", price: 2500, category: "Minuman", stock: 100, info: "Minuman Serbuk" },
+        { name: "Marimas Rasa Jeruk Saset", price: 1000, category: "Minuman", stock: 200, info: "Minuman Serbuk" },
+        { name: "Sisri Teh Gula Batu Saset", price: 1000, category: "Minuman", stock: 200, info: "Minuman Serbuk" },
+        { name: "Pop Ice Rasa Chocolate", price: 3000, category: "Minuman", stock: 80, info: "Minuman Serbuk" },
+        { name: "Pop Ice Rasa Strawberry", price: 3000, category: "Minuman", stock: 80, info: "Minuman Serbuk" },
+        { name: "Pop Ice Rasa Melon", price: 3000, category: "Minuman", stock: 80, info: "Minuman Serbuk" },
+        { name: "Kratingdaeng Botol", price: 6500, category: "Minuman", stock: 40, info: "Energy Drink" },
+        { name: "You C1000 Vitamin Lemon", price: 8500, category: "Minuman", stock: 30, info: "Suplemen Vitamin" },
+        { name: "You C1000 Vitamin Orange", price: 8500, category: "Minuman", stock: 30, info: "Suplemen Vitamin" },
+        // === KEBERSIHAN ===
+        { name: "Sabun Lifebuoy Batang Merah", price: 4500, category: "Kebersihan", stock: 50, info: "-" },
+        { name: "Sabun Nuvo Batang Cair", price: 4500, category: "Kebersihan", stock: 50, info: "-" },
+        { name: "Sampo Sunsilk Hijau Saset", price: 1000, category: "Kebersihan", stock: 200, info: "-" },
+        { name: "Sampo Clear Men Saset", price: 1500, category: "Kebersihan", stock: 200, info: "-" },
+        { name: "Pepsodent Pasta Gigi 75g", price: 7500, category: "Kebersihan", stock: 40, info: "-" },
+        { name: "Sunlight Pencuci Piring Saset", price: 2000, category: "Kebersihan", stock: 100, info: "-" },
+        { name: "Mama Lemon Saset Jeruk Nipis", price: 2000, category: "Kebersihan", stock: 100, info: "-" },
+        { name: "Rinso Bubuk Deterjen 400g", price: 12000, category: "Kebersihan", stock: 30, info: "-" },
+        { name: "Daia Deterjen Bubuk Putih", price: 11500, category: "Kebersihan", stock: 30, info: "-" },
+        { name: "So Klin Pewangi Pakaian Saset", price: 1000, category: "Kebersihan", stock: 150, info: "-" },
+        // === ROKOK ===
+        { name: "Sampoerna Mild 16", price: 35000, category: "Rokok", stock: 15, info: "Eceran: Rp 2500" },
+        { name: "Sampoerna Mild 12", price: 28000, category: "Rokok", stock: 20, info: "Eceran: Rp 2500" },
+        { name: "Sampoerna Kretek Hijau", price: 16000, category: "Rokok", stock: 25, info: "Eceran: Rp 1500" },
+        { name: "Gudang Garam Filter 12", price: 25000, category: "Rokok", stock: 30, info: "Eceran: Rp 2200" },
+        { name: "Gudang Garam Filter 16", price: 33000, category: "Rokok", stock: 15, info: "Eceran: Rp 2300" },
+        { name: "Surya 12", price: 26000, category: "Rokok", stock: 40, info: "Eceran: Rp 2300" },
+        { name: "Surya 16", price: 35000, category: "Rokok", stock: 35, info: "Eceran: Rp 2400" },
+        { name: "Surya Pro Mild Putih", price: 30000, category: "Rokok", stock: 15, info: "Eceran: Rp 2200" },
+        { name: "Surya Pro Red", price: 30000, category: "Rokok", stock: 15, info: "Eceran: Rp 2200" },
+        { name: "Djarum Super 12", price: 25000, category: "Rokok", stock: 20, info: "Eceran: Rp 2200" },
+        { name: "Djarum Super 16", price: 33000, category: "Rokok", stock: 15, info: "Eceran: Rp 2300" },
+        { name: "Djarum Black regular", price: 32000, category: "Rokok", stock: 12, info: "Eceran: Rp 2300" },
+        { name: "Djarum LA Bold 20", price: 36000, category: "Rokok", stock: 18, info: "Eceran: Rp 2200" },
+        { name: "LA Lights 16", price: 33000, category: "Rokok", stock: 15, info: "Eceran: Rp 2300" },
+        { name: "LA Ice Purple Boost", price: 34000, category: "Rokok", stock: 10, info: "Eceran: Rp 2400" },
+        { name: "Magnum Filter Hitam", price: 24000, category: "Rokok", stock: 25, info: "Eceran: Rp 2000" },
+        { name: "Magnum Blue Mild", price: 29000, category: "Rokok", stock: 15, info: "Eceran: Rp 2200" },
+        { name: "Marlboro Merah Putih", price: 42000, category: "Rokok", stock: 10, info: "Eceran: Rp 3000" },
+        { name: "Marlboro Light Gold", price: 42000, category: "Rokok", stock: 10, info: "Eceran: Rp 3000" },
+        { name: "Marlboro Ice Burst", price: 45000, category: "Rokok", stock: 8, info: "Eceran: Rp 3200" },
+        { name: "Camel Option Purple", price: 31000, category: "Rokok", stock: 14, info: "Eceran: Rp 2200" },
+        { name: "Camel Black Filter", price: 30000, category: "Rokok", stock: 15, info: "Eceran: Rp 2100" },
+        { name: "Dunhill Mild", price: 34000, category: "Rokok", stock: 10, info: "Eceran: Rp 2400" },
+        { name: "Win Filter", price: 24000, category: "Rokok", stock: 20, info: "Eceran: Rp 1800" },
+        { name: "Win Click Menthol", price: 25000, category: "Rokok", stock: 15, info: "Eceran: Rp 1800" },
+        { name: "Juara Teh Manis Kretek", price: 15000, category: "Rokok", stock: 30, info: "Eceran: Rp 1200" },
+        { name: "Juara Ginseng", price: 15000, category: "Rokok", stock: 20, info: "Eceran: Rp 1200" },
+        { name: "Wismilak Diplomat 16", price: 35000, category: "Rokok", stock: 10, info: "Eceran: Rp 2500" },
+        { name: "Dunhill Filter Hitam", price: 36000, category: "Rokok", stock: 12, info: "Eceran: Rp 2500" },
+        { name: "Clas Mild 16", price: 32000, category: "Rokok", stock: 20, info: "Eceran: Rp 2300" },
+        // === PRODUK TITIPAN ===
+        { name: "Kerupuk Kulit Sapi Bungkus", price: 5000, category: "Produk Titipan", stock: 30, info: "Titipan: Bu Endang (Bagi Hasil: 20%)" },
+        { name: "Kerupuk Udang Mini", price: 3000, category: "Produk Titipan", stock: 40, info: "Titipan: Pak Joko (Bagi Hasil: 15%)" },
+        { name: "Kripik Pisang Manis", price: 6000, category: "Produk Titipan", stock: 20, info: "Titipan: Bu Ani (Bagi Hasil: 18%)" },
+        { name: "Peyek Kacang Tanah", price: 4000, category: "Produk Titipan", stock: 25, info: "Titipan: Wak Udin (Bagi Hasil: 25%)" }
+    ];
+
+    let dbProducts = [];
+    let dbTransactions = [];
+    let dbBons = [];
+    let dbSecurityLogs = [];
+    let cart = [];
+    let currentPOSCategory = "Semua";
+    let systemPin = "1234";
+    let isSystemUnlocked = false; 
+    let currentTabTarget = "pos";
+    let autoLockTimer = null;
+    let profitPercentageGlobal = 35.00;
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    let voiceRecognitionInstance = null;
+
+    window.onload = function() {
+        loadEngineData();
+        initSettings();
+        renderAllViewports();
+        logSecurityEvent("SYSTEM BOOT", "Sistem Enterprise v35.0 Online Berhasil.");
+    };
+
+    function loadEngineData() {
+        if(localStorage.getItem('w_prod_v35')) {
+            dbProducts = JSON.parse(localStorage.getItem('w_prod_v35'));
+            dbTransactions = JSON.parse(localStorage.getItem('w_tx_v35') || '[]');
+            dbBons = JSON.parse(localStorage.getItem('w_bons_v35') || '[]');
+            dbSecurityLogs = JSON.parse(localStorage.getItem('w_logs_v35') || '[]');
+            systemPin = localStorage.getItem('w_pin_v35') || '1234';
+            profitPercentageGlobal = parseFloat(localStorage.getItem('w_profit_v35') || '35.00');
+        } else {
+            let idCounter = 1;
+            rawMasterSetup.forEach(p => {
+                dbProducts.push({
+                    id: "P" + idCounter++,
+                    name: p.name,
+                    category: p.category,
+                    cost: Math.round(p.price * 0.7),
+                    price: p.price,
+                    stock: p.stock,
+                    info: p.info
+                });
+            });
+            saveDataToStorage();
+        }
+    }
+
+    function saveDataToStorage() {
+        localStorage.setItem('w_prod_v35', JSON.stringify(dbProducts));
+        localStorage.setItem('w_tx_v35', JSON.stringify(dbTransactions));
+        localStorage.setItem('w_bons_v35', JSON.stringify(dbBons));
+        localStorage.setItem('w_logs_v35', JSON.stringify(dbSecurityLogs));
+        localStorage.setItem('w_pin_v35', systemPin);
+        localStorage.setItem('w_profit_v35', profitPercentageGlobal.toString());
+    }
+
+    function initSettings() {
+        document.getElementById("cfgName").value = localStorage.getItem("w_name_v35") || "WARUNG PINTAR HUB";
+        document.getElementById("headerWarungName").innerText = localStorage.getItem("w_name_v35") || "WARUNG PINTAR HUB";
+        updateFinancialRatioDisplay(profitPercentageGlobal);
+    }
+
+    function logSecurityEvent(type, detail) {
+        const time = new Date().toLocaleString('id-ID');
+        dbSecurityLogs.unshift(`[${time}] ${type}: ${detail}`);
+        if(dbSecurityLogs.length > 80) dbSecurityLogs.pop();
+        saveDataToStorage();
+        renderSecurityLogs();
+    }
+
+    function renderSecurityLogs() {
+        const box = document.getElementById("securityLogBox");
+        if(box) box.innerHTML = dbSecurityLogs.join("<br>");
+    }
+
+    function renderAllViewports() {
+        renderPOSProducts();
+        renderCartList();
+        renderGudangTable();
+        renderBonTable();
+        renderAccountingData();
+        renderSecurityLogs();
+    }
+
+    function switchTab(tabId) {
+        resetAutoLockTimer();
+        if(tabId === 'pos') { activateTabUI(tabId); return; }
+        if(isSystemUnlocked) { activateTabUI(tabId); return; }
+
+        currentTabTarget = tabId;
+        document.querySelectorAll('.main-content').forEach(c => c.style.display = 'none');
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('ownerAuthGateway').style.display = 'block';
+        document.getElementById('gatewayPinInput').focus();
+    }
+
+    function activateTabUI(tabId) {
+        document.querySelectorAll('.main-content').forEach(c => c.style.display = 'none');
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(tabId).style.display = 'block';
+        
+        const btns = document.querySelectorAll('.nav-tabs .tab-btn');
+        const map = { 'pos': 0, 'gudang': 1, 'bon': 2, 'akuntansi': 3, 'pengaturan': 4 };
+        if(btns[map[tabId]]) btns[map[tabId]].classList.add('active');
+    }
+
+    function unlockGatewayEngine() {
+        const pin = document.getElementById("gatewayPinInput").value;
+        if(pin === systemPin) {
+            isSystemUnlocked = true;
+            document.getElementById("gatewayPinInput").value = "";
+            const badge = document.getElementById("securityBadge");
+            badge.innerText = "🔓 Mode Pemilik Aktif";
+            badge.className = "badge badge-unlocked";
+            document.getElementById("lockBtn").style.display = "inline-flex";
+            
+            logSecurityEvent("ACCESS_GRANTED", "Pemilik masuk ke modul secure.");
+            activateTabUI(currentTabTarget);
+            renderAllViewports();
+            startAutoLockCountdown();
+        } else {
+            alert("PIN Salah!");
+            logSecurityEvent("SECURITY_ALERT", "Upaya masuk gagal (PIN salah).");
+        }
+    }
+
+    function lockSystemManual() {
+        isSystemUnlocked = false;
+        const badge = document.getElementById("securityBadge");
+        badge.innerText = "🔒 Mode Kasir Terkunci";
+        badge.className = "badge badge-locked";
+        document.getElementById("lockBtn").style.display = "none";
+        switchTab('pos');
+    }
+
+    function startAutoLockCountdown() {
+        if(autoLockTimer) clearTimeout(autoLockTimer);
+        autoLockTimer = setTimeout(() => {
+            if(isSystemUnlocked) {
+                logSecurityEvent("AUTO_LOCK", "Sistem otomatis mengunci (Idle 60s).");
+                lockSystemManual();
+            }
+        }, 60000);
+    }
+
+    function resetAutoLockTimer() {
+        if(isSystemUnlocked) startAutoLockCountdown();
+    }
+
+    // ================== POS KASIR LOGIC ==================
+    function renderPOSProducts() {
+        const grid = document.getElementById("posProductGrid");
+        grid.innerHTML = "";
+        
+        const filtered = dbProducts.filter(p => currentPOSCategory === "Semua" || p.category === currentPOSCategory);
+        
+        filtered.forEach(p => {
+            const isLow = p.stock <= 15;
+            const card = document.createElement("div");
+            card.className = `p-card ${isLow ? 'low-stock' : ''}`;
+            card.onclick = () => addToCart(p.id);
+            card.innerHTML = `
+                <div class="p-title">${p.name}</div>
+                <div style="text-align:center; margin-top:5px;">
+                    <span style="font-size:12px; color:var(--text-muted); block-size: auto;">Stok: <strong>${p.stock}</strong></span><br>
+                    <span style="font-weight:700; color:var(--primary); font-size:14px;">Rp ${p.price.toLocaleString('id-ID')}</span>
+                </div>
+            `;
+            grid.appendChild(card);
+        });
+    }
+
+    function filterPOS(cat) {
+        currentPOSCategory = cat;
+        renderPOSProducts();
+    }
+
+    function addToCart(id) {
+        const prod = dbProducts.find(p => p.id === id);
+        if(!prod) return;
+        
+        if(prod.stock <= 0) {
+            alert("Stok barang ini habis di gudang!");
+            return;
+        }
+        
+        const exist = cart.find(item => item.id === id);
+        if(exist) {
+            if(exist.qty >= prod.stock) {
+                alert("Tidak bisa menambah! Batas maksimum sesuai stok gudang tercapai.");
+                return;
+            }
+            exist.qty++;
+        } else {
+            cart.push({ id: id, name: prod.name, price: prod.price, qty: 1, cost: prod.cost });
+        }
+        renderCartList();
+    }
+
+    function updateCartQty(id, delta) {
+        const item = cart.find(i => i.id === id);
+        if(!item) return;
+        const prod = dbProducts.find(p => p.id === id);
+        
+        item.qty += delta;
+        if(item.qty > prod.stock) {
+            alert("Batas stok kritis terlampaui!");
+            item.qty = prod.stock;
+        }
+        if(item.qty <= 0) {
+            cart = cart.filter(i => i.id !== id);
+        }
+        renderCartList();
+    }
+
+    function renderCartList() {
+        const list = document.getElementById("cartItemsList");
+        list.innerHTML = "";
+        let total = 0;
+        
+        cart.forEach(item => {
+            const sub = item.price * item.qty;
+            total += sub;
+            const li = document.createElement("li");
+            li.className = "cart-item";
+            li.innerHTML = `
+                <div style="max-width:55%;"><strong>${item.name}</strong><br><span style="font-size:12px; color:var(--text-muted);">@ Rp ${item.price.toLocaleString('id-ID')}</span></div>
+                <div class="qty-controls">
+                    <button class="qty-btn" onclick="updateCartQty('${item.id}', -1)">-</button>
+                    <span style="font-weight:bold; width:20px; text-align:center;">${item.qty}</span>
+                    <button class="qty-btn" onclick="updateCartQty('${item.id}', 1)">+</button>
+                </div>
+                <div style="font-weight:600;">Rp ${sub.toLocaleString('id-ID')}</div>
+            `;
+            list.appendChild(li);
+        });
+        
+        document.getElementById("cartTotal").innerText = "Rp " + total.toLocaleString('id-ID');
+        calculatePOSChange();
+    }
+
+    function calculatePOSChange() {
+        let total = 0;
+        cart.forEach(i => total += (i.price * i.qty));
+        const cash = parseFloat(document.getElementById("cashPay").value) || 0;
+        const diff = cash - total;
+        
+        if(diff >= 0) {
+            document.getElementById("posChangeLabel").style.color = "var(--success)";
+            document.getElementById("posChangeAmount").innerText = "Rp " + diff.toLocaleString('id-ID');
+        } else {
+            document.getElementById("posChangeLabel").style.color = "var(--danger)";
+            document.getElementById("posChangeAmount").innerText = "Rp 0 (Kurang Rp " + Math.abs(diff).toLocaleString('id-ID') + ")";
+        }
+    }
+
+    function clearCart() {
+        cart = [];
+        document.getElementById("cashPay").value = "";
+        renderCartList();
+    }
+
+    function checkoutPOS() {
+        if(cart.length === 0) { alert("Keranjang kosong!"); return; }
+        
+        let total = 0;
+        let totalCost = 0;
+        cart.forEach(i => {
+            total += (i.price * i.qty);
+            totalCost += (i.cost * i.qty);
+        });
+        
+        const cash = parseFloat(document.getElementById("cashPay").value) || 0;
+        if(cash < total) {
+            alert("Pembayaran tunai kurang!");
+            return;
+        }
+
+        // Potong stok master
+        cart.forEach(item => {
+            const realProd = dbProducts.find(p => p.id === item.id);
+            if(realProd) realProd.stock -= item.qty;
+        });
+
+        const profit = total - totalCost;
+        const timestamp = new Date().toLocaleString('id-ID');
+        
+        dbTransactions.push({
+            time: timestamp,
+            type: "PENJUALAN POS",
+            amount: total,
+            profit: profit
+        });
+
+        // Tampilkan Modal Struk
+        document.getElementById("stName").innerText = localStorage.getItem("w_name_v35") || "WARUNG PINTAR HUB";
+        const itemsContainer = document.getElementById("stItems");
+        itemsContainer.innerHTML = "";
+        cart.forEach(i => {
+            itemsContainer.innerHTML += `<div style="display:flex; justify-content:space-between;"><span>${i.name} x${i.qty}</span><span>Rp ${(i.price*i.qty).toLocaleString('id-ID')}</span></div>`;
+        });
+        document.getElementById("stTotal").innerText = "Rp " + total.toLocaleString('id-ID');
+        document.getElementById("stCash").innerText = "Rp " + cash.toLocaleString('id-ID');
+        document.getElementById("stChange").innerText = "Rp " + (cash - total).toLocaleString('id-ID');
+        
+        document.getElementById("receiptModal").style.display = "flex";
+        
+        logSecurityEvent("TRANSACTION_POS", `Penjualan sebesar Rp ${total.toLocaleString('id-ID')}`);
+        clearCart();
+        saveDataToStorage();
+        renderAllViewports();
+    }
+
+    function closePOSReceipt() {
+        document.getElementById("receiptModal").style.display = "none";
+    }
+
+    // ================== CORE GUDANG & FORM MANUAL ==================
+    function renderGudangTable() {
+        const tbody = document.getElementById("gudangTableBody");
+        tbody.innerHTML = "";
+        
+        dbProducts.forEach(p => {
+            const tr = document.createElement("tr");
+            if(p.stock <= 15) tr.style.backgroundColor = "#fff5f5";
+            tr.innerHTML = `
+                <td><strong>${p.name}</strong><br><span style="font-size:11px; color:var(--text-muted);">${p.id}</span></td>
+                <td><span style="font-size:12px; background:#e2e8f0; padding:2px 6px; border-radius:4px;">${p.category}</span></td>
+                <td>Rp ${p.cost.toLocaleString('id-ID')}</td>
+                <td>Rp ${p.price.toLocaleString('id-ID')}</td>
+                <td style="font-weight:bold; color:${p.stock <= 15 ? 'var(--danger)':'inherit'}">${p.stock}</td>
+                <td>
+                    <button class="btn btn-p" style="padding:3px 8px; font-size:12px;" onclick="loadProductToForm('${p.id}')">✏️ Edit</button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function loadProductToForm(id) {
+        const p = dbProducts.find(item => item.id === id);
+        if(!p) return;
+        document.getElementById("prodIdHidden").value = p.id;
+        document.getElementById("gudangProdName").value = p.name;
+        document.getElementById("gudangProdCategory").value = p.category;
+        document.getElementById("gudangProdCost").value = p.cost;
+        document.getElementById("gudangProdPrice").value = p.price;
+        document.getElementById("gudangProdStock").value = p.stock;
+        document.getElementById("gudangFormTitle").innerText = "Edit Produk: " + p.id;
+    }
+
+    function resetGudangForm() {
+        document.getElementById("prodIdHidden").value = "";
+        document.getElementById("gudangProdName").value = "";
+        document.getElementById("gudangProdCost").value = "";
+        document.getElementById("gudangProdPrice").value = "";
+        document.getElementById("gudangProdStock").value = "";
+        document.getElementById("gudangFormTitle").innerText = "Tambah / Edit Produk";
+    }
+
+    function saveProductManual() {
+        const id = document.getElementById("prodIdHidden").value;
+        const name = document.getElementById("gudangProdName").value.trim();
+        const cat = document.getElementById("gudangProdCategory").value;
+        const cost = parseFloat(document.getElementById("gudangProdCost").value) || 0;
+        const price = parseFloat(document.getElementById("gudangProdPrice").value) || 0;
+        const stock = parseInt(document.getElementById("gudangProdStock").value) || 0;
+
+        if(!name) { alert("Nama produk tidak boleh kosong!"); return; }
+
+        if(id) {
+            // Update
+            const p = dbProducts.find(item => item.id === id);
+            if(p) {
+                p.name = name; p.category = cat; p.cost = cost; p.price = price; p.stock = stock;
+                logSecurityEvent("UPDATE_PRODUCT", `Manual Edit ${id} - ${name}`);
+            }
+        } else {
+            // New Item
+            const newId = "P" + (dbProducts.length + 1);
+            dbProducts.push({ id: newId, name: name, category: cat, cost: cost, price: price, stock: stock, info: "-" });
+            logSecurityEvent("ADD_PRODUCT", `Manual Add ${newId} - ${name}`);
+        }
+        
+        saveDataToStorage();
+        resetGudangForm();
+        renderAllViewports();
+    }
+
+    // ================== BUKU BON LOGIC ==================
+    function addBonRecord() {
+        const name = document.getElementById("bonName").value.trim();
+        const amt = parseFloat(document.getElementById("bonAmount").value) || 0;
+        const note = document.getElementById("bonNote").value.trim();
+        
+        if(!name || amt <= 0) { alert("Nama dan jumlah bon tidak valid!"); return; }
+        
+        dbBons.push({ name: name, amount: amt, note: note });
+        logSecurityEvent("BON_ADD", `${name} mengambil bon sebesar Rp ${amt.toLocaleString('id-ID')}`);
+        
+        document.getElementById("bonName").value = "";
+        document.getElementById("bonAmount").value = "";
+        document.getElementById("bonNote").value = "";
+        saveDataToStorage();
+        renderAllViewports();
+    }
+
+    function payBonFull(index) {
+        const b = dbBons[index];
+        if(!b) return;
+        
+        dbTransactions.push({
+            time: new Date().toLocaleString('id-ID'),
+            type: "PELUNASAN BON ("+b.name+")",
+            amount: b.amount,
+            profit: 0 // Asumsi keuntungan sudah dihitung saat penyerahan barang di awal
+        });
+        
+        logSecurityEvent("BON_CLEAR", `${b.name} melunasi hutang Rp ${b.amount.toLocaleString('id-ID')}`);
+        dbBons.splice(index, 1);
+        saveDataToStorage();
+        renderAllViewports();
+    }
+
+    function renderBonTable() {
+        const tbody = document.getElementById("bonTableBody");
+        tbody.innerHTML = "";
+        dbBons.forEach((b, idx) => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td><strong>${b.name}</strong></td>
+                <td style="color:var(--danger); font-weight:700;">Rp ${b.amount.toLocaleString('id-ID')}</td>
+                <td><span style="font-size:12px; font-style:italic; color:var(--text-muted);">${b.note || '-'}</span></td>
+                <td><button class="btn btn-g" style="padding:4px 8px; font-size:12px;" onclick="payBonFull(${idx})">✅ Lunas</button></td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    // ================== AKUNTANSI & RASIO FINANSIAL ==================
+    function renderAccountingData() {
+        let rev = 0; let prof = 0; let totalBon = 0;
+        dbTransactions.forEach(t => { rev += t.amount; prof += t.profit; });
+        dbBons.forEach(b => { totalBon += b.amount; });
+        
+        document.getElementById("summaryRevenue").innerText = "Rp " + rev.toLocaleString('id-ID');
+        document.getElementById("summaryProfit").innerText = "Rp " + prof.toLocaleString('id-ID');
+        document.getElementById("summaryBon").innerText = "Rp " + totalBon.toLocaleString('id-ID');
+        
+        const tbody = document.getElementById("accountingTableBody");
+        tbody.innerHTML = "";
+        dbTransactions.slice().reverse().forEach(t => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `<td>${t.time}</td><td><strong>${t.type}</strong></td><td>Rp ${t.amount.toLocaleString('id-ID')}</td><td style="color:var(--success); font-weight:bold;">Rp ${t.profit.toLocaleString('id-ID')}</td>`;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function updateFinancialRatioDisplay(profitPercent) {
+        let hppHarian = 100 - profitPercent;
+        document.getElementById("harianHpp").innerText = `${hppHarian.toFixed(2)}%`;
+        document.getElementById("harianProfit").innerText = `${profitPercent.toFixed(2)}%`;
+        
+        let hppMingguan = hppHarian - 2.5; 
+        let profitMingguan = 100 - hppMingguan;
+        document.getElementById("mingguanHpp").innerText = `${hppMingguan.toFixed(2)}%`;
+        document.getElementById("mingguanProfit").innerText = `${profitMingguan.toFixed(2)}%`;
+
+        let hppBulanan = hppHarian - 5.0;
+        let profitBulanan = 100 - hppBulanan;
+        document.getElementById("bulananHpp").innerText = `${hppBulanan.toFixed(2)}%`;
+        document.getElementById("bulananProfit").innerText = `${profitBulanan.toFixed(2)}%`;
+    }
+
+    // ================== VOICE DECODER ENGINE GLOBAL ==================
+    function textToNumberParser(str) {
+        const numWords = { "nol":0,"satu":1,"dua":2,"tiga":3,"empat":4,"lima":5,"enam":6,"tujuh":7,"delapan":8,"sembilan":9,"sepuluh":10,"sebelas":11,"dua belas":12,"tiga belas":13,"empat belas":14,"lima belas":15,"dua puluh":20,"tiga puluh":30,"empat puluh":40,"lima puluh":50,"ratus":100,"ribu":1000,"juta":1000000 };
+        let words = str.split(" ");
+        let total = 0; let temp = 0;
+        
+        for (let i = 0; i < words.length; i++) {
+            let w = words[i];
+            if (numWords[w] !== undefined) {
+                let val = numWords[w];
+                if (val === 100 || val === 1000 || val === 1000000) {
+                    if (temp === 0) temp = 1;
+                    total += temp * val; temp = 0;
+                } else { temp += val; }
+            }
+        }
+        total += temp;
+        return total > 0 ? total : (parseInt(str.match(/\d+/)) || 0);
+    }
+
+    function startVoiceAIInterpreter(moduleType) {
+        if (!SpeechRecognition) { alert("Browser tidak mendukung Web Speech API."); return; }
+        if (voiceRecognitionInstance) { voiceRecognitionInstance.stop(); }
+
+        voiceRecognitionInstance = new SpeechRecognition();
+        voiceRecognitionInstance.lang = 'id-ID';
+        voiceRecognitionInstance.interimResults = false;
+
+        const micBtn = moduleType === 'pos' ? document.getElementById("posMicBtn") : document.getElementById("gudangMicBtn");
+        const outText = moduleType === 'pos' ? document.getElementById("aiVoiceOutput") : document.getElementById("aiGudangVoiceOutput");
+        
+        micBtn.classList.add("btn-mic-active");
+        outText.innerText = "Mendengarkan ucapan...";
+
+        voiceRecognitionInstance.onresult = function(event) {
+            const speechResult = event.results[0][0].transcript.toLowerCase();
+            outText.innerText = `Terpahami: "${speechResult}"`;
+            
+            if (moduleType === 'pos') { parsePosVoiceCommand(speechResult); } 
+            else { parseGudangVoiceCommand(speechResult); }
+        };
+
+        voiceRecognitionInstance.onend = function() { micBtn.classList.remove("btn-mic-active"); };
+        voiceRecognitionInstance.onerror = function() { outText.innerText = "Gagal menangkap suara."; micBtn.classList.remove("btn-mic-active"); };
+        voiceRecognitionInstance.start();
+    }
+
+    function parsePosVoiceCommand(cmd) {
+        // Deteksi Perintah Mengubah Keuntungan Dinamis via Suara
+        if (cmd.includes("keuntungan") || cmd.includes("set keuntungan")) {
+            const val = textToNumberParser(cmd);
+            if(val > 0 && val <= 100) {
+                profitPercentageGlobal = val;
+                updateFinancialRatioDisplay(val);
+                saveDataToStorage();
+                logSecurityEvent("VOICE_FINANCE", `Mengubah rasio profit harian menjadi ${val}% via suara.`);
+                renderAccountingData();
+                return;
+            }
+        }
+
+        // Transaksi POS biasa
+        let qty = 1;
+        if(cmd.includes("banyak") || cmd.includes("jumlah")) { qty = textToNumberParser(cmd) || 1; }
+        else {
+            const words = cmd.split(" ");
+            const lastWord = words[words.length - 1];
+            const parsedLast = textToNumberParser(lastWord);
+            if(parsedLast > 0 && parsedLast < 20) qty = parsedLast;
+        }
+
+        let found = false;
+        dbProducts.forEach(p => {
+            if(cmd.includes(p.name.toLowerCase())) {
+                for(let k=0; k<qty; k++) addToCart(p.id);
+                found = true;
+            }
+        });
+        if(!found) { document.getElementById("aiVoiceOutput").innerText = "Nama produk tidak cocok dengan master data."; }
+    }
+
+    function parseGudangVoiceCommand(cmd) {
+        // Struktur Perintah Pintar Gudang
+        // "Tambah produk baru [Nama] harga modal [X] harga jual [Y] stok [Z]"
+        if(cmd.includes("tambah produk baru") || cmd.includes("update produk")) {
+            let clean = cmd.replace("tambah produk baru", "").replace("update produk", "");
+            let parts = clean.split("harga modal");
+            let namePart = parts[0].trim();
+            
+            let cost = 0; let price = 0; let stock = 0;
+            if(parts[1]) {
+                let subParts = parts[1].split("harga jual");
+                cost = textToNumberParser(subParts[0]);
+                if(subParts[1]) {
+                    let stockParts = subParts[1].split("stok");
+                    price = textToNumberParser(stockParts[0]);
+                    if(stockParts[1]) {
+                        stock = textToNumberParser(stockParts[1]);
+                    }
+                }
+            }
+
+            // Validasi keberadaan item
+            let exist = dbProducts.find(p => p.name.toLowerCase() === namePart || namePart.includes(p.name.toLowerCase()));
+            if(exist) {
+                if(cost > 0) exist.cost = cost;
+                if(price > 0) exist.price = price;
+                if(stock > 0) exist.stock = stock;
+                logSecurityEvent("VOICE_GUDANG_UPDATE", `Update ${exist.id} via Suara`);
+            } else {
+                let newId = "P" + (dbProducts.length + 1);
+                dbProducts.push({ id: newId, name: namePart.toUpperCase(), category: "Sembako", cost: cost||1000, price: price||1500, stock: stock||10, info: "Ditambahkan via Voice AI" });
+                logSecurityEvent("VOICE_GUDANG_ADD", `Item Baru ${newId} via Suara`);
+            }
+            saveDataToStorage();
+            renderAllViewports();
+        }
+    }
+
+    // Input Lapangan Dasar Menggunakan Rute Mikrofon untuk Form Tertentu
+    function startBasicSpeechRoute(targetId) {
+        if (!SpeechRecognition) return;
+        const rec = new SpeechRecognition();
+        rec.lang = 'id-ID';
+        rec.onresult = function(e) {
+            document.getElementById(targetId).value = e.results[0][0].transcript;
+        };
+        rec.start();
+    }
+
+    // ================== PENGATURAN & MAINTENANCE ==================
+    function saveSystemSettings() {
+        const val = document.getElementById("cfgName").value.trim();
+        if(val) {
+            localStorage.setItem("w_name_v35", val);
+            document.getElementById("headerWarungName").innerText = val;
+            alert("Identitas warung berhasil dimutasi.");
+        }
+    }
+
+    function updateSecurityPin() {
+        const oldP = document.getElementById("pinOld").value;
+        const newP = document.getElementById("pinNew").value;
+        if(oldP === systemPin && newP.length >= 4) {
+            systemPin = newP;
+            saveDataToStorage();
+            alert("PIN Keamanan berhasil diperbarui.");
+            document.getElementById("pinOld").value = "";
+            document.getElementById("pinNew").value = "";
+            logSecurityEvent("SECURITY_PIN_CHANGED", "PIN Gerbang diubah.");
+        } else { alert("Verifikasi kegagalan otorisasi PIN lama!"); }
+    }
+
+    function exportSystemDatabase() {
+        const payload = { products: dbProducts, transactions: dbTransactions, bons: dbBons, logs: dbSecurityLogs, pin: systemPin, globalProfit: profitPercentageGlobal };
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(payload));
+        const a = document.createElement('a');
+        a.setAttribute("href", dataStr);
+        a.setAttribute("download", `BACKUP_WARUNGPINTAR_V35_${new Date().toISOString().slice(0,10)}.json`);
+        a.click();
+    }
+
+    function importSystemDatabase(event) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const parsed = JSON.parse(e.target.result);
+                if(parsed.products) {
+                    dbProducts = parsed.products;
+                    dbTransactions = parsed.transactions || [];
+                    dbBons = parsed.bons || [];
+                    dbSecurityLogs = parsed.logs || [];
+                    systemPin = parsed.pin || "1234";
+                    profitPercentageGlobal = parsed.globalProfit || 35.00;
+                    saveDataToStorage();
+                    initSettings();
+                    renderAllViewports();
+                    alert("Database berhasil dipulihkan secara utuh!");
+                }
+            } catch(err) { alert("Format backup rusak!"); }
+        };
+        reader.readAsText(event.target.files[0]);
+    }
+
+    function secureFactoryReset() {
+        if(confirm("PERINGATAN! Tindakan ini akan menghapus semua records data finansial, inventaris gudang, dan buku bon secara permanen. Lanjutkan?")) {
+            localStorage.clear();
+            alert("Sistem dibersihkan. Memuat ulang default pabrik...");
+            location.reload();
+        }
+    }
+</script>
+</body>
+</html>
